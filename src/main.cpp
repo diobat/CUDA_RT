@@ -6,6 +6,16 @@
 
 #include <random>
 
+vec3 random_in_unit_sphere()
+{
+    vec3 p;
+    do
+    {
+        p = 2.0f * vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX, (float) rand() / RAND_MAX) - vec3(1, 1, 1);
+    } while (p.squared_length() >= 1.0f);
+    return p;
+}
+
 float hit_sphere ( const vec3& center, float radius, const ray& r)
 {
     vec3 oc = r.origin() - center;
@@ -24,9 +34,10 @@ float hit_sphere ( const vec3& center, float radius, const ray& r)
 vec3 color(const ray& r, hitable *world)
 {   
     hit_record rec;
-    if(world->hit(r, 0.0, MAXFLOAT, rec))
+    if(world->hit(r, 0.001, MAXFLOAT, rec))
     {
-        return 0.5f * vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
+        vec3 target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5f * color(ray(rec.p, target - rec.p), world);
     }
     else
     {
@@ -76,6 +87,7 @@ int main()
 
             col /= float(ns);
 
+            col = vec3(std::sqrt(col[0]), std::sqrt(col[1]), std::sqrt(col[2]));
             int ir = int (255.99 * col[0]);
             int ig = int (255.99 * col[1]);
             int ib = int (255.99 * col[2]);
