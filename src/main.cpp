@@ -68,7 +68,12 @@ int main()
     list[4] = new sphere(vec3(-1, 0, -1), -0.45, new dielectric(1.5));
     hitable *world = new hitableList(list, 5);
 
-    camera cam(vec3(-1,1,0), vec3(0,0,-1), vec3(0,1,0), 90, float(nx) / float(ny));
+    vec3 lookFrom(3, 3, 2);
+    vec3 lookAt(0, 0, -1);
+    float dist_to_focus = (lookFrom - lookAt).length();
+    float aperture = 2.0;
+
+    camera cam(lookFrom, lookAt, vec3(0,1,0), 20, float(nx) / float(ny), aperture, dist_to_focus);
 
     for (int j = ny - 1 ; j >= 0 ; j--)
     {
@@ -84,7 +89,6 @@ int main()
 
                 vec3 p = r.point_at_parameter(2.0);
                 col += color(r, world, 0);
-
             }
 
             col /= float(ns);
